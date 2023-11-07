@@ -286,10 +286,12 @@ FROM `notional-grove-399523.base_dados_pnad_covid.base-11-2020` -- Terceira base
     
             df_trabalho = pd.read_csv('./datasets_gerados/tabela-tratada-result-test-09-a-11-2020.csv') # OK
 
+        # Caracteristicas da população
         with st.container():
-            st.subheader('Caracteristicas da população')
+            st.subheader('1 - Caracteristicas da população')
 
-            st.write('1.1 - Distribuição de entrevistados por imagem')
+            st.write('1.1 - Distribuição de entrevistados por idades')
+            st.write('A quantidade de entrevistados se concentra na casa dos 35 aos 45')
             scatter = alt.Chart(df_trabalho).mark_bar(width=15).encode(
                 alt.X("idade", bin=True, scale=alt.Scale(bins=[df_trabalho.idade.min(),
                                                                 df_trabalho.idade.min() + 20,
@@ -301,6 +303,7 @@ FROM `notional-grove-399523.base_dados_pnad_covid.base-11-2020` -- Terceira base
             st.altair_chart(scatter)
 
             st.write('1.2 - Composição do sexo nos entrevistados')
+            st.write('Em termos de divisão a diferença de entrevistados por sexo difere por uma porcentagem baixas')
             df = px.data.tips()
             s_sexo = df_trabalho['sexo'].value_counts(normalize=True).round(4)*100 #proporção sexo pesquisa total
             lbl_sexo = ['Mulher', 'Homem']
@@ -308,34 +311,65 @@ FROM `notional-grove-399523.base_dados_pnad_covid.base-11-2020` -- Terceira base
             print(s_sexo.index)
             st.plotly_chart(fig)
 
+            st.write('1.3 - Raças')
+            st.write('A maior parte dos entrevistados se consideram de cor parda.')
+
+            cor_raca_dict = {
+                1: "Branca",
+                2: "Preta",
+                3: "Amarela",
+                4: "Parda",
+                5: "Indígena",
+                9: "Ignorado"
+            }
+            df_trabalho.cor_raca = df_trabalho.cor_raca.map(cor_raca_dict)
+            fig = px.bar(x=df_trabalho['cor_raca'].value_counts(ascending=False).values, y=df_trabalho['cor_raca'].unique())
+            st.plotly_chart(fig)
+            #df_trabalho['cor_raca'].value_counts(ascending=False).values
+
+            st.write('---')
+
+        # Dados da saúde
         with st.container():
-           
+            st.subheader('2 - Dados de saúde')
 
-            st.subheader('Avaliação das respostas não respondidas dos entrevistados')
-            percent_nulos = 100*((df_trabalho.isnull().sum())/(len(df_trabalho))).round(3) # avaliação de dados nulos
-            percent_nulos = percent_nulos.sort_values(ascending=True)
-            df_percent_nulos = pd.DataFrame(percent_nulos, columns=['Qtde Valores Nulos'])
+            st.write('2.1 - Realização de testes para a COVID-19')
+            st.write('Um dos pontos mais importantes no controle da doença é realizar a separação \
+                     dos contaminados daqueles individuos saudáveis. Na análise desse número percebe \
+                     a grande parcela dos entrevistados não realizou o teste. É de conhecimento que \
+                     existem pessoas assintomáticas (Não possuem sintomas), e por isso é mais do que \
+                     necessário entender quem são aqueles que fazem parte do grupo ')
+            
+            teste_coronavirus_dict = {
+                1: "Positivo",
+                2: "Negativo",
+                3: "Inconclusivo",
+                4: "Ainda não recebeu o resultado",
+                9: "Ignorado"
+            }
 
-            st.bar_chart(df_percent_nulos, y='Qtde Valores Nulos')
+            df_trabalho.resultado_teste = df_trabalho.resultado_teste.map(teste_coronavirus_dict)
+            df_trabalho['resultado_teste'] = df_trabalho['resultado_teste'].fillna("Não Fez") #assumindo valores nulos como Não fez o teste
+            
+            st.write('**Valores não batem, entender o por que**')
+            fig = px.bar(x=df_trabalho["resultado_teste"].value_counts(ascending=False).values,
+                          y= df_trabalho["resultado_teste"].unique())
+            
+            st.plotly_chart(fig)
+            #fig.show()
+
+            st.write('2.2 - Resultados dos testes positivos com base na idade')
+            st.write('De acordo com a Organização mundial da saúde, um dos grupos de risco apresentados são \
+                      pessoas com a idade mais avançada. ')
+            
+            df_positivos = df_trabalho[df_trabalho["resultado_teste"] == "Positivo"]
+            fig = px.histogram(df_positivos, x="idade")
+            st.plotly_chart(fig)
+
+
 
             st.write("""
-                Com exceção aos dados relacionados ao usuário (uf, idade, sexo e cor_raça),
-                todos os demais dados contém dados nulos ou ausentes, com uma maior concentração nas colunas:
-
-                *   "resultado_teste" - `96% de dados ausentes`
-                *   "procurou_unid_saude" - `96% de dados ausentes`
-                *   "faixa_rendimento" - `63% de dados ausentes`
-
-
-                Em específico, a coluna "resultado_teste" chama a atenção pelo volume de dados faltantes.
-                Este fato deverá ser levado em consideração em relação às análises realizadas nesse documento,
-                principalmente em relação às de espécie clínica e econômicas.
-            """)
-
-            st.subheader('Análise de famílias positivadas a partir do teste de covid')
-
-            st.write("""
-                Ao todo, `14.450` famílias receberam um diagnóstico positivo em relação ao teste de Covid.
+                Ao todo, `14.450` individuos receberam um diagnóstico positivo em relação ao teste de Covid.
 
                 > `28,4%` da população que fez teste de Covid
 
@@ -357,6 +391,12 @@ FROM `notional-grove-399523.base_dados_pnad_covid.base-11-2020` -- Terceira base
             st.write("Share Positivados versus total da base: {:.1f}%".format(share_positivados_total))
 
             st.write('---')
+
+        # Caracteristicas clinicas
+        with st.container():
+            st.subheader('3 - Características clínicas dos sintomas')
+
+            ## Alocar os dados sobre a gravidade
 
             st.subheader("Relação entre familias positivadas versus famílias sintomáticas ( 2 ou + sintomas)")
             st.write("""
@@ -396,3 +436,7 @@ FROM `notional-grove-399523.base_dados_pnad_covid.base-11-2020` -- Terceira base
 
             total_sin_por_coluna.name = 'Volume de familias com sintomas'
             st.bar_chart(total_sin_por_coluna)
+
+        # Caracteristicas economicas
+        with st.container():
+            st.subheader('4 - Caracteristicas economicas x casos')
