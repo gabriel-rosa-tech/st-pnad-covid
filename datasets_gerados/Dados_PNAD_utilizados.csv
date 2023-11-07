@@ -1,0 +1,21 @@
+nº,Cod Dict,nome_tratado,Type,Descrição
+1,UF,uf,Usuário,Unidade da Federação
+2,A002,idade,Usuário,Idade do morador
+3,A003,sexo,Usuário,Sexo
+4,A004,cor_raca,Usuário,Cor ou raça
+5,B0011,sin_febre,Sintomático,Na semana passada teve febre?
+6,B0012,sin_tosse,Sintomático,Na semana passada teve tosse?
+7,B0013,sin_dor_garganta,Sintomático,Na semana passada teve dor de garganta?
+8,B0014,sin_dific_respirar,Sintomático,Na semana passada teve dificuldade para respirar?
+9,B0015,sin_dor_cabeca,Sintomático,Na semana passada teve dor de cabeça?
+10,B0016,si_dor_peito,Sintomático,Na semana passada teve dor no peito?
+11,B0017,sin_nausea,Sintomático,Na semana passada teve náusea?
+12,B0018,sin_nariz_entup,Sintomático,Na semana passada teve nariz entupido ou escorrendo?
+13,B0019,sin_fadiga,Sintomático,Na semana passada teve fadiga?
+14,B00111,sin_perda_olf,Sintomático,Na semana passada teve perda de cheiro ou sabor?
+15,B00112,sin_dor_muscular,Sintomático,Na semana passada teve dor muscular?
+16,B009B,resultado_teste,Comportamental,Qual o resultado do teste?
+18,B002,fez_isolamento,Comportamental,"Por causa disso, foi a algum estabelecimento de saúde?"
+17,B011,procurou_unid_saude,Comportamental,"Qual foi o resultado do teste? Na semana passada, devido à pandemia do Coronavírus, em que medida o(a) Sr(a) restringiu o contato com as pessoas?"
+19,D0051,recebeu_aux,Econômico,Auxílios emergenciais relacionados ao coronavirus
+20,C011A11,faixa_rendimento,Econômico,Número da faixa do rendimento/retirada em dinheiro
