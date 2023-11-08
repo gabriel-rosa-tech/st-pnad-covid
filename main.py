@@ -117,7 +117,8 @@ if __name__== '__main__':
 
     st.dataframe(pd.read_csv('./datasets_gerados/Dados_PNAD_utilizados.csv', encoding='utf-8'))
 
-    tab_tratamento, tab_analise, tab_conclusao = st.tabs(['Tratamento dados', 'Análise', 'Propostas de ações'])
+    
+    tab_tratamento, tab_analise, tab_conclusao, tab_projeto = st.tabs(['📊 Tratamento dados', ' 📊 Análise', '📊 Propostas de ações', '📜 Informações do Projeto'])
 
     with tab_tratamento:
         st.subheader('Iniciativa BigQuery')
@@ -507,3 +508,17 @@ FROM `notional-grove-399523.base_dados_pnad_covid.base-11-2020` -- Terceira base
                  casos assintomáticos. Sendo assim, para maior controle um número maior de testes deve \
                  ser aplicado para conseguir identificar precocemente os confirmado e assim permitir \
                  que eles tenham um tempo de recuperação isoalados para não trasmitirem para outras pessoas.')
+    with tab_projeto:
+        st.subheader('Sobre')
+        st.write('Projeto desenvolvido por Estudantes da FIAP - Pós Tech em Data Analytics.')
+        st.write("")
+        st.subheader("Referências")
+        st.markdown('<a href="https://www.ibge.gov.br/estatisticas/investigacoes-experimentais/estatisticas-experimentais/27946-divulgacao-semanal-pnadcovid1?t=downloads&utm_source=covid19&utm_medium=hotsite&utm_campaign=covid_19">\
+            <b>Base de Dados PNAD Covid-19</b></a>', unsafe_allow_html=True)
+        st.write("")
+        st.subheader("Responsáveis")
+        st.markdown("<li>Brendon Calazans</li>\
+            <li>Gabriel Rosa</li> \
+            <li>Carlos Eduardo</li> \
+            <li><Barbara Campos/li>", unsafe_allow_html=True)
+
