@@ -112,8 +112,6 @@ if __name__== '__main__':
 
     st.dataframe(pd.read_csv('./datasets_gerados/Dados_PNAD_utilizados.csv', encoding='utf-8'))
 
-    st.markdown('<hr/>', unsafe_allow_html=True)
-
     tab_tratamento, tab_analise, tab_conclusao = st.tabs(['Tratamento dados', 'Análise', 'Propostas de ações'])
 
     with tab_tratamento:
@@ -285,7 +283,7 @@ FROM `notional-grove-399523.base_dados_pnad_covid.base-11-2020` -- Terceira base
             #st.bar_chart(dataset_mes, x='mes', y='Qtd Entrevistados')
     
             df_trabalho = pd.read_csv('./datasets_gerados/tabela-tratada-result-test-09-a-11-2020.csv') # OK
-
+            df_trabalho = an.tratamento_df(df_trabalho)
         # Caracteristicas da população
         with st.container():
             st.subheader('1 - Caracteristicas da população')
@@ -304,28 +302,16 @@ FROM `notional-grove-399523.base_dados_pnad_covid.base-11-2020` -- Terceira base
 
             st.write('1.2 - Composição do sexo nos entrevistados')
             st.write('Em termos de divisão a diferença de entrevistados por sexo difere por uma porcentagem baixas')
-            df = px.data.tips()
+
             s_sexo = df_trabalho['sexo'].value_counts(normalize=True).round(4)*100 #proporção sexo pesquisa total
-            lbl_sexo = ['Mulher', 'Homem']
-            fig = px.pie(values=s_sexo, names=lbl_sexo, color=['red', 'blue'])
-            print(s_sexo.index)
+            fig = px.pie(values=s_sexo, names=s_sexo.index, color=['red', 'blue'])
             st.plotly_chart(fig)
 
             st.write('1.3 - Raças')
             st.write('A maior parte dos entrevistados se consideram de cor parda.')
 
-            cor_raca_dict = {
-                1: "Branca",
-                2: "Preta",
-                3: "Amarela",
-                4: "Parda",
-                5: "Indígena",
-                9: "Ignorado"
-            }
-            df_trabalho.cor_raca = df_trabalho.cor_raca.map(cor_raca_dict)
             fig = px.bar(x=df_trabalho['cor_raca'].value_counts(ascending=False).values, y=df_trabalho['cor_raca'].unique())
             st.plotly_chart(fig)
-            #df_trabalho['cor_raca'].value_counts(ascending=False).values
 
             st.write('---')
 
@@ -340,23 +326,12 @@ FROM `notional-grove-399523.base_dados_pnad_covid.base-11-2020` -- Terceira base
                      existem pessoas assintomáticas (Não possuem sintomas), e por isso é mais do que \
                      necessário entender quem são aqueles que fazem parte do grupo ')
             
-            teste_coronavirus_dict = {
-                1: "Positivo",
-                2: "Negativo",
-                3: "Inconclusivo",
-                4: "Ainda não recebeu o resultado",
-                9: "Ignorado"
-            }
-
-            df_trabalho.resultado_teste = df_trabalho.resultado_teste.map(teste_coronavirus_dict)
             df_trabalho['resultado_teste'] = df_trabalho['resultado_teste'].fillna("Não Fez") #assumindo valores nulos como Não fez o teste
             
-            st.write('**Valores não batem, entender o por que**')
             fig = px.bar(x=df_trabalho["resultado_teste"].value_counts(ascending=False).values,
                           y= df_trabalho["resultado_teste"].unique())
             
             st.plotly_chart(fig)
-            #fig.show()
 
             st.write('2.2 - Resultados dos testes positivos com base na idade')
             st.write('De acordo com a Organização mundial da saúde, um dos grupos de risco apresentados são \
@@ -366,29 +341,27 @@ FROM `notional-grove-399523.base_dados_pnad_covid.base-11-2020` -- Terceira base
             fig = px.histogram(df_positivos, x="idade")
             st.plotly_chart(fig)
 
+            # st.write("""
+            #     Ao todo, `14.450` individuos receberam um diagnóstico positivo em relação ao teste de Covid.
 
+            #     > `28,4%` da população que fez teste de Covid
 
-            st.write("""
-                Ao todo, `14.450` individuos receberam um diagnóstico positivo em relação ao teste de Covid.
+            #     > `1,3%` da população total da base.
 
-                > `28,4%` da população que fez teste de Covid
-
-                > `1,3%` da população total da base.
-
-                > Apenas `4%` da população realizaram um teste para diagnóstico (50.931).
-            """)
+            #     > Apenas `4%` da população realizaram um teste para diagnóstico (50.931).
+            # """)
         
-            df_fez_teste = df_trabalho["resultado_teste"].count()
-            df_positivados = df_trabalho[df_trabalho["resultado_teste"] == "Positivo"]
-            share_positivados_total = ((len(df_positivados))/(len(df_trabalho))) * 100
-            share_positivados_test = ((len(df_positivados))/ df_fez_teste) * 100
-            share_fizeram_teste = (df_fez_teste /(len(df_trabalho))) * 100
+            # df_fez_teste = df_trabalho["resultado_teste"].count()
+            # df_positivados = df_trabalho[df_trabalho["resultado_teste"] == "Positivo"]
+            # share_positivados_total = ((len(df_positivados))/(len(df_trabalho))) * 100
+            # share_positivados_test = ((len(df_positivados))/ df_fez_teste) * 100
+            # share_fizeram_teste = (df_fez_teste /(len(df_trabalho))) * 100
 
-            st.write("Total de famílias que fizeram teste: {:,.0f}".format(df_fez_teste))
-            st.write("Total de famílias positivadas: {:,.0f}".format(len(df_positivados)))
-            st.write("Share de famílias que fizeram teste: {:.1f}%".format(share_fizeram_teste))
-            st.write("Share Positivados versus fizeram teste: {:.1f}%".format(share_positivados_test))
-            st.write("Share Positivados versus total da base: {:.1f}%".format(share_positivados_total))
+            # st.write("Total de famílias que fizeram teste: {:,.0f}".format(df_fez_teste))
+            # st.write("Total de famílias positivadas: {:,.0f}".format(len(df_positivados)))
+            # st.write("Share de famílias que fizeram teste: {:.1f}%".format(share_fizeram_teste))
+            # st.write("Share Positivados versus fizeram teste: {:.1f}%".format(share_positivados_test))
+            # st.write("Share Positivados versus total da base: {:.1f}%".format(share_positivados_total))
 
             st.write('---')
 
@@ -396,47 +369,97 @@ FROM `notional-grove-399523.base_dados_pnad_covid.base-11-2020` -- Terceira base
         with st.container():
             st.subheader('3 - Características clínicas dos sintomas')
 
-            ## Alocar os dados sobre a gravidade
+            df_trabalho_positivo = df_trabalho[df_trabalho["resultado_teste"] == "Positivo"]
+            df_trabalho_positivo['gravidade'] = df_trabalho_positivo.apply(lambda row: an.gravidade_caso(row), axis=1)
 
-            st.subheader("Relação entre familias positivadas versus famílias sintomáticas ( 2 ou + sintomas)")
-            st.write("""
-                > Com o baixo volume de testes e de famílias positivadas, buscamos entender se haveria um volume maior de famílias sintómáticas. Ou seja, que apresentaram 2 ou mais sintomas.
-
-                Famílias sintomáticas:
-                *   `2.1%` em relação ao total da base total
-                *   `48%` das famílias sintomáticas fizeram o teste de Covid
-                *   `59%` das famílias positivadas apresentaram mais de 2 sintomas
-            """)
-
-            colunas_sintomas = df_trabalho.iloc[:, 4:-5]
-            lista_colunas_sintomas = colunas_sintomas.columns.to_list() # criação de uma lista contendo nomes de columas de sintomas
+            df_gravidade = df_trabalho_positivo[['resultado_teste', 'gravidade']].groupby('gravidade').count().reset_index()
+            df_gravidade = df_gravidade.sort_values(by='resultado_teste', ascending=False)
             
-            sintomas_dict = {
-                1: "Sim",
-                2: "Não",
-                3: "Não sabe",
-                9: None
-            }
 
-            for coll in lista_colunas_sintomas:
-                df_trabalho[coll] = df_trabalho[coll].map(sintomas_dict)
+            st.write('Com o objetivo de entender quais são os sintomas que ocorrem nos pacientes houve a separação \
+                     em três categorias de casos: Assintomáticos, Leve e Grave')
+            st.write('Sendo assintomáticos aqueles que não houveram nenhum tipo de sintoma, leve para quem teve: \
+                     febre, tosse, dor na garganta, dor de cabeça, nausea, nariz entupido, fadiga, perda de \
+                     olfato e dor muscular. Pois estes não apresentavam riscos de precisarem de oxigênio. E casos graves \
+                     dificuldade de respirar e dor no peito.')
+            st.write('No gráfico abaixo é levantado o número de casos positivados que tiveram alguns destes sintomas')
 
-            # Tratamento e adição de uma nova coluna no dataframe com a soma de sintomas por família (qtd_sintomas)
-            tem_sint = {"Sim" : True, "Não" : False,"Não sabe" : False,None : False}
-            df_sintomas = df_trabalho.iloc[:, 4:-6]
+            fig = px.bar(df_gravidade, x='gravidade', y='resultado_teste')
+            st.plotly_chart(fig)
 
-            for coll in df_sintomas.columns.to_list():
-                df_sintomas[coll] = df_sintomas[coll].map(tem_sint)
-
-            qtd_sintomas = df_sintomas.sum(axis=1)
-            df_trabalho['qtd_sintomas'] = qtd_sintomas
+            st.write('Levando em conta o comportamento daqueles que estavam com covid mas eram assintomáticos \
+                     por isso não apresentaram sintomas foi questionado sobre se houve isolamento de outras \
+                     pessoas')
             
-            nome_colunas_sintomas = df_sintomas.columns.to_list() # listagem de colunas com sintomas
-            total_sin_por_coluna = df_trabalho[nome_colunas_sintomas].apply(lambda col: (col == 'Sim').sum()).sort_values(ascending=False) # Contabilize o total de "Sim" em cada coluna de sintomas
+            df_assintomaticos_positivados = df_trabalho_positivo[df_trabalho_positivo["gravidade"] == "Assintomático"]
+            fig = px.bar(x=df_assintomaticos_positivados['fez_isolamento'].unique(),
+                          y=df_assintomaticos_positivados['fez_isolamento'].value_counts(ascending=False).values)
+            st.plotly_chart(fig)
 
-            total_sin_por_coluna.name = 'Volume de familias com sintomas'
-            st.bar_chart(total_sin_por_coluna)
+            # st.subheader("Relação entre familias positivadas versus famílias sintomáticas ( 2 ou + sintomas)")
+            # st.write("""
+            #     > Com o baixo volume de testes e de famílias positivadas, buscamos entender se haveria um volume maior de famílias sintómáticas. Ou seja, que apresentaram 2 ou mais sintomas.
+
+            #     Famílias sintomáticas:
+            #     *   `2.1%` em relação ao total da base total
+            #     *   `48%` das famílias sintomáticas fizeram o teste de Covid
+            #     *   `59%` das famílias positivadas apresentaram mais de 2 sintomas
+            # """)
+
+            # colunas_sintomas = df_trabalho.iloc[:, 4:-5]
+            # lista_colunas_sintomas = colunas_sintomas.columns.to_list() # criação de uma lista contendo nomes de columas de sintomas
+            
+            # sintomas_dict = {
+            #     1: "Sim",
+            #     2: "Não",
+            #     3: "Não sabe",
+            #     9: None
+            # }
+
+            # for coll in lista_colunas_sintomas:
+            #     df_trabalho[coll] = df_trabalho[coll].map(sintomas_dict)
+
+            # # Tratamento e adição de uma nova coluna no dataframe com a soma de sintomas por família (qtd_sintomas)
+            # tem_sint = {"Sim" : True, "Não" : False,"Não sabe" : False,None : False}
+            # df_sintomas = df_trabalho.iloc[:, 4:-6]
+
+            # for coll in df_sintomas.columns.to_list():
+            #     df_sintomas[coll] = df_sintomas[coll].map(tem_sint)
+
+            # qtd_sintomas = df_sintomas.sum(axis=1)
+            # df_trabalho['qtd_sintomas'] = qtd_sintomas
+            
+            # nome_colunas_sintomas = df_sintomas.columns.to_list() # listagem de colunas com sintomas
+            # total_sin_por_coluna = df_trabalho[nome_colunas_sintomas].apply(lambda col: (col == 'Sim').sum()).sort_values(ascending=False) # Contabilize o total de "Sim" em cada coluna de sintomas
+
+            # total_sin_por_coluna.name = 'Volume de familias com sintomas'
+            # st.bar_chart(total_sin_por_coluna)
 
         # Caracteristicas economicas
         with st.container():
             st.subheader('4 - Caracteristicas economicas x casos')
+
+    with tab_conclusao:
+        st.subheader('Ações a serem tomadas em novo surto')
+
+        st.write("""
+            Com os insights gerados, tendo como principais fatores o entendimento da população 
+            em seus comportamentos, sintomas e situação econômica. Foi gerado uma plano de ação
+            para combater um novo surto de Covid-19.
+        """)
+        st.write('Olhando para as caracteristicas da população, como onde moram, sexo e \
+                 raça não é possivel encontrar por ai um fator agravante que aumente o número de \
+                 casos para um grupo especifico. Então o hospital deve reforçar que todos pacientes \
+                 precisam continuar seguindo os protocolos de segurança independentemente de  \
+                 região ou qualquer outro fator.')
+        
+        st.write('Um dos problemas para a coleta de informações de dados em relação a saúde é a \
+                 falta de realizações de testes. Um indicador mostrado no gráfico 2.1 fica evidente \
+                 a discrepância nos valores de realizados e dos que não fizeram.')
+        st.write('A implicação da falta de diagnostico leva a um problema que é de suma importância \
+                 ser evitado para o controle de um surto. Os que não fazem o teste de forma recorrente \
+                 para confirmar se estão infectados pela Covid, podem ser transmissores silenciosos. \
+                 Como ficou observado aqueles que tiveram seu teste confirmado, em grande parte foram \
+                 casos assintomáticos. Sendo assim, para maior controle um número maior de testes deve \
+                 ser aplicado para conseguir identificar precocemente os confirmado e assim permitir \
+                 que eles tenham um tempo de recuperação isoalados para não trasmitirem para outras pessoas.')
