@@ -518,7 +518,7 @@ FROM `notional-grove-399523.base_dados_pnad_covid.base-11-2020` -- Terceira base
         st.write("")
         st.subheader("Responsáveis")
         st.markdown("<li>Barbara Campos</li> \
-            <li>Carlos Eduardo</li> \
             <li>Brendon Calazans</li>\
+            <li>Carlos Eduardo</li> \
             <li>Gabriel Rosa</li>", unsafe_allow_html=True)
 
