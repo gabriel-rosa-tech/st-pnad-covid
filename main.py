@@ -476,6 +476,7 @@ FROM `notional-grove-399523.base_dados_pnad_covid.base-11-2020` -- Terceira base
                      confirmação de Covid-19 ')
 
             df_positivo_faixa = df_positivos['faixa_rendimento'].value_counts(normalize=True).round(4)*100
+            st.dataframe(df_positivo_faixa)
             fig = px.bar(df_positivo_faixa, x=df_positivo_faixa.index, y='faixa_rendimento',
                          labels={'index':'Faixa de rendimento', 'faixa_rendimento':'Porcentagem'},
                         #  color=df_positivo_faixa.index
